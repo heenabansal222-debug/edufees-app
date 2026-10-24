@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#172d4f">
+<meta name="description" content="School fee management app for student records, fee collection and receipts.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>EduFees — School Fee Management</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172033;background:#f3f6fb;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:11px;padding:11px 14px;background:#1d4ed8;color:#fff;font-weight:650}button.secondary{background:#e8eef8;color:#17345f}button.danger{background:#fee2e2;color:#991b1b}button:disabled{opacity:.45;cursor:not-allowed}
+header{background:#172d4f;color:white;padding:18px max(16px,calc((100vw - 1120px)/2));display:flex;align-items:center;gap:13px;justify-content:space-between;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center}.logo{width:46px;height:46px;border-radius:13px;background:#ffffff20;display:grid;place-items:center;font-size:25px}.brand h1{font-size:21px;margin:0}.brand p{margin:3px 0 0;color:#d5e1f2;font-size:12px}.header-actions{display:flex;gap:8px;flex-wrap:wrap}.header-actions button{background:#ffffff1c;color:white;border:1px solid #ffffff35}
+main{max-width:1120px;margin:0 auto;padding:18px 15px 44px}.nav{display:flex;gap:8px;overflow-x:auto;padding:3px 0 15px}.nav button{white-space:nowrap;background:#e4eaf4;color:#42516a}.nav button.active{background:#1d4ed8;color:white}
+h2{margin:8px 0 5px;font-size:25px}.sub{color:#68758a;margin:0 0 18px;font-size:14px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.card,.panel{background:#fff;border:1px solid #e4eaf2;border-radius:17px;padding:17px;box-shadow:0 2px 7px #182d4a08}.stat-label{color:#6c7890;font-size:13px}.stat-value{font-size:clamp(20px,3vw,28px);font-weight:800;margin-top:7px;overflow-wrap:anywhere}.green{color:#13845c}.amber{color:#b77908}.blue{color:#245fc3}.purple{color:#7651b5}.progress{height:10px;background:#e7edf5;border-radius:99px;overflow:hidden;margin:13px 0 7px}.progress span{height:100%;display:block;background:#15966a;border-radius:99px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:15px}.panel h3{margin:0 0 13px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:13px;color:#526078;font-weight:650}.field input,.field select,.search{width:100%;padding:11px 12px;border:1px solid #d8e0eb;border-radius:10px;background:#fff;color:#172033;min-width:0}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #edf0f5;white-space:nowrap}th{font-size:12px;color:#6b778c;text-transform:uppercase;letter-spacing:.035em}td strong{display:block}td small{color:#748096}.pill{display:inline-block;padding:5px 8px;border-radius:99px;font-size:12px;font-weight:700}.pill.paid{background:#dcfce7;color:#166534}.pill.pending{background:#fef3c7;color:#92400e}.muted{color:#738097}.empty{padding:24px;text-align:center;color:#758198}.notice{display:none;padding:12px 14px;margin-bottom:13px;border-radius:11px;background:#e0f2fe;color:#075985}.notice.show{display:block}.recent{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #edf0f5}.recent:last-child{border:0}.receipt{border:1px dashed #aab6c8;border-radius:12px;padding:16px;margin-top:14px}.receipt h3{text-align:center}.hidden{display:none!important}footer{text-align:center;color:#8792a5;font-size:12px;margin:25px 0 0}
+@media(max-width:760px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}header{padding:15px}.brand h1{font-size:19px}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.card,.panel{padding:14px}}
+@media print{header,.nav,.no-print,footer,.notice{display:none!important}body{background:white}main{padding:0;max-width:none}.panel,.card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}.receipt{display:block!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">🎓</div><div><h1>EduFees</h1><p>School Fee Management System</p></div></div>
+  <div class="header-actions"><button id="installBtn" class="hidden">＋ Install app</button><button id="backupBtn">Export backup</button><button id="restoreBtn">Import backup</button><input id="restoreFile" type="file" accept="application/json,.json" class="hidden"></div>
+</header>
+<main>
+  <div id="notice" class="notice" role="status"></div>
+  <nav class="nav no-print" aria-label="Main navigation">
+    <button data-page="dashboard" class="active">Dashboard</button><button data-page="students">Students</button><button data-page="collect">Collect fee</button><button data-page="payments">Payments</button><button data-page="reports">Reports</button><button data-page="settings">Settings</button>
+  </nav>
+  <section id="dashboard" class="page">
+    <h2>Dashboard</h2><p class="sub">Your school's fee overview at a glance.</p>
+    <div class="stats">
+      <div class="card"><div class="stat-label">Students</div><div class="stat-value blue" id="statStudents">0</div></div>
+      <div class="card"><div class="stat-label">Fees collected</div><div class="stat-value green" id="statCollected">₹0</div></div>
+      <div class="card"><div class="stat-label">Pending fees</div><div class="stat-value amber" id="statPending">₹0</div></div>
+      <div class="card"><div class="stat-label">Total assigned</div><div class="stat-value purple" id="statTotal">₹0</div></div>
+    </div>
+    <div class="panel" style="margin-top:14px"><div class="row"><h3>Collection progress</h3><strong id="progressPct">0%</strong></div><div class="progress"><span id="progressBar" style="width:0%"></span></div><small class="muted" id="progressText">₹0 collected out of ₹0</small></div>
+    <div class="layout"><div class="panel"><h3>Recent payments</h3><div id="recentPayments"></div></div><div class="panel"><h3>Pending fee balances</h3><div id="pendingPreview"></div></div></div>
+  </section>
+  <section id="students" class="page hidden">
+    <h2>Students</h2><p class="sub">Register students and keep their fee records up to date.</p>
+    <div class="panel"><h3 id="studentFormTitle">Add a student</h3><form id="studentForm"><input id="editStudentId" type="hidden"><div class="formgrid">
+      <div class="field"><label for="studentName">Full name *</label><input id="studentName" required maxlength="100" placeholder="e.g. Aarav Sharma"></div>
+      <div class="field"><label for="studentClass">Class / section *</label><input id="studentClass" required maxlength="30" placeholder="e.g. 10-A"></div>
+      <div class="field"><label for="rollNumber">Roll number</label><input id="rollNumber" maxlength="30" placeholder="e.g. 14"></div>
+      <div class="field"><label for="annualFee">Total fee (₹) *</label><input id="annualFee" required type="number" min="0" step="0.01" placeholder="24000"></div>
+    </div><div class="actions"><button type="submit">Save student</button><button type="button" id="cancelEdit" class="secondary hidden">Cancel edit</button></div></form></div>
+    <div class="panel" style="margin-top:14px"><div class="row" style="flex-wrap:wrap"><h3>Student register</h3><input id="studentSearch" class="search" style="max-width:300px" placeholder="Search name, ID, class…"></div><div class="tablewrap"><table><thead><tr><th>Student</th><th>Class</th><th>Total fee</th><th>Paid</th><th>Balance</th><th>Status</th><th class="no-print">Actions</th></tr></thead><tbody id="studentsBody"></tbody></table></div></div>
+  </section>
+  <section id="collect" class="page hidden">
+    <h2>Collect fee</h2><p class="sub">Record a payment and generate a receipt. This records a payment only; it does not transfer money.</p>
+    <div class="panel"><form id="paymentForm"><div class="formgrid">
+      <div class="field full"><label for="paymentStudent">Student *</label><select id="paymentStudent" required></select></div>
+      <div class="field"><label>Total fee</label><input id="feeTotalDisplay" disabled></div><div class="field"><label>Outstanding balance</label><input id="feeBalanceDisplay" disabled></div>
+      <div class="field"><label for="paymentAmount">Payment amount (₹) *</label><input id="paymentAmount" required type="number" min="0.01" step="0.01" placeholder="1000"></div>
+      <div class="field"><label for="paymentMethod">Payment method *</label><select id="paymentMethod"><option>Cash</option><option>UPI (record only)</option><option>Bank transfer (record only)</option><option>Cheque</option><option>Other</option></select></div>
+      <div class="field full"><label for="paymentNote">Note (optional)</label><input id="paymentNote" maxlength="250" placeholder="e.g. Term 2 fee"></div>
+    </div><div class="actions"><button type="submit">Record payment</button></div></form><div id="receipt" class="receipt hidden"></div></div>
+  </section>
+  <section id="payments" class="page hidden">
+    <h2>Payment history</h2><p class="sub">Every payment recorded in this app.</p>
+    <div class="panel"><div class="row" style="flex-wrap:wrap"><h3>Transactions</h3><input id="paymentSearch" class="search" style="max-width:300px" placeholder="Search receipt or student…"></div><div class="tablewrap"><table><thead><tr><th>Receipt</th><th>Date</th><th>Student</th><th>Method</th><th>Amount</th><th class="no-print">Receipt</th></tr></thead><tbody id="paymentsBody"></tbody></table></div></div>
+  </section>
+  <section id="reports" class="page hidden">
+    <h2>Reports</h2><p class="sub">Review outstanding balances and export data for your project.</p>
+    <div class="stats"><div class="card"><div class="stat-label">Total assigned</div><div class="stat-value purple" id="reportTotal">₹0</div></div><div class="card"><div class="stat-label">Collected</div><div class="stat-value green" id="reportCollected">₹0</div></div><div class="card"><div class="stat-label">Outstanding</div><div class="stat-value amber" id="reportPending">₹0</div></div><div class="card"><div class="stat-label">Transactions</div><div class="stat-value blue" id="reportTransactions">0</div></div></div>
+    <div class="panel" style="margin-top:14px"><div class="row"><h3>Outstanding balances</h3><button id="exportCsv" class="secondary">Export student CSV</button></div><div class="tablewrap"><table><thead><tr><th>Student</th><th>Class</th><th>Total</th><th>Paid</th><th>Outstanding</th></tr></thead><tbody id="reportBody"></tbody></table></div></div>
+    <div class="actions no-print"><button id="exportPaymentsCsv" class="secondary">Export payments CSV</button><button id="printReport" class="secondary">Print this page</button></div>
+  </section>
+  <section id="settings" class="page hidden">
+    <h2>Settings</h2><p class="sub">Personalize your local copy of EduFees.</p>
+    <div class="panel"><form id="settingsForm"><div class="formgrid">
+      <div class="field full"><label for="schoolName">School name</label><input id="schoolName" maxlength="120" placeholder="Your School Name"></div>
+      <div class="field"><label for="currency">Currency</label><select id="currency"><option value="INR">Indian Rupee (₹)</option><option value="USD">US Dollar ($)</option><option value="GBP">Pound (£)</option></select></div>
+    </div><div class="actions"><button type="submit">Save settings</button></div></form></div>
+    <div class="panel" style="margin-top:14px"><h3>Data and privacy</h3><p class="muted">Records are stored in this browser on this device. They are not automatically uploaded or synced. Export a backup regularly. Anyone with access to this browser profile may be able to access these records.</p><div class="actions"><button id="backupBtn2" class="secondary">Export backup</button><button id="clearData" class="danger">Delete all app data</button></div></div>
+  </section>
+  <footer>EduFees • School project edition • Keep backups of your data</footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
